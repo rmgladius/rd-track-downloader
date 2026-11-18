@@ -1,7 +1,7 @@
 <Project>
   <!-- Versão única do programa: o verificador de atualização compara com a da última release. -->
   <PropertyGroup>
-    <Version>1.1.0</Version>
+    <Version>1.2.0</Version>
     <Product>RD Track Downloader</Product>
     <Authors>Rodrigo Dias</Authors>
     <SatelliteResourceLanguages>pt-BR</SatelliteResourceLanguages>
