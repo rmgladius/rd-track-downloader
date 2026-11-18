@@ -21,7 +21,8 @@ public static class Sobre
 
 public partial class MainWindow
 {
-    private DispatcherTimer? _emailCopiado;
+    /// <summary>Rótulos trocados por "copiado": o texto de antes e o relógio que o devolve.</summary>
+    private readonly Dictionary<TextBlock, (string Original, DispatcherTimer Relogio)> _copiados = [];
 
     private bool SobreAberto => PainelSobre.Visibility == Visibility.Visible;
 
@@ -41,22 +42,28 @@ public partial class MainWindow
         SobreVersao.Text = _versaoNova is { } nova
             ? $"Versão {Atualizador.VersaoAtualTexto} · a {nova.Texto} já saiu"
             : $"Versão {Atualizador.VersaoAtualTexto}";
-        PainelSobre.Visibility = Visibility.Visible;
-        PainelSobre.Focus();
-        if (Capturando)
-            return;
-
-        var duracao = TimeSpan.FromMilliseconds(170);
-        PainelSobre.BeginAnimation(OpacityProperty, new DoubleAnimation(0, 1, duracao));
-        CartaoSobreDesloc.BeginAnimation(TranslateTransform.YProperty,
-            new DoubleAnimation(12, 0, duracao) { EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut } });
+        MostrarPainel(PainelSobre, CartaoSobreDesloc);
     }
 
     private void FecharSobre()
     {
         PainelSobre.Visibility = Visibility.Collapsed;
-        VoltarRotuloDoEmail();
+        VoltarRotulos();
         CampoLink.Focus();
+    }
+
+    /// <summary>Sobre e Apoiar entram do mesmo jeito: o fundo escurece e o cartão sobe um pouco.</summary>
+    private void MostrarPainel(UIElement painel, TranslateTransform deslocamento)
+    {
+        painel.Visibility = Visibility.Visible;
+        painel.Focus();
+        if (Capturando)
+            return;
+
+        var duracao = TimeSpan.FromMilliseconds(170);
+        painel.BeginAnimation(OpacityProperty, new DoubleAnimation(0, 1, duracao));
+        deslocamento.BeginAnimation(TranslateTransform.YProperty,
+            new DoubleAnimation(12, 0, duracao) { EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut } });
     }
 
     /// <summary>GitHub, Instagram, código-fonte: o endereço vem no Tag do botão.</summary>
@@ -70,33 +77,45 @@ public partial class MainWindow
     /// Copia em vez de abrir um "mailto:": muita gente usa o e-mail no navegador e não tem
     /// programa de e-mail configurado no Windows, e aí o clique não faria nada.
     /// </summary>
-    private void CopiarEmail_Click(object sender, RoutedEventArgs e)
+    private void CopiarEmail_Click(object sender, RoutedEventArgs e) => Copiar(Sobre.Email, EmailRotulo, "E-mail copiado");
+
+    /// <summary>Copia e troca o rótulo da linha por um aviso verde, que volta ao normal em 2,5 s.</summary>
+    private void Copiar(string texto, TextBlock rotulo, string aviso)
     {
         try
         {
             if (!Capturando) // as capturas não mexem na área de transferência de quem roda
-                Clipboard.SetText(Sobre.Email);
+                Clipboard.SetText(texto);
         }
         catch
         {
             return; // área de transferência ocupada por outro programa
         }
 
-        EmailRotulo.Text = "E-mail copiado";
-        EmailRotulo.Foreground = Pincel("Sucesso");
-        _emailCopiado ??= new DispatcherTimer { Interval = TimeSpan.FromSeconds(2.5) };
-        _emailCopiado.Tick -= EmailCopiado_Tick;
-        _emailCopiado.Tick += EmailCopiado_Tick;
-        _emailCopiado.Stop();
-        _emailCopiado.Start();
+        if (!_copiados.TryGetValue(rotulo, out var copiado))
+        {
+            copiado = (rotulo.Text, new DispatcherTimer { Interval = TimeSpan.FromSeconds(2.5) });
+            copiado.Relogio.Tick += (_, _) => VoltarRotulo(rotulo);
+            _copiados[rotulo] = copiado;
+        }
+        rotulo.Text = aviso;
+        rotulo.Foreground = Pincel("Sucesso");
+        copiado.Relogio.Stop();
+        copiado.Relogio.Start();
     }
 
-    private void EmailCopiado_Tick(object? sender, EventArgs e) => VoltarRotuloDoEmail();
-
-    private void VoltarRotuloDoEmail()
+    private void VoltarRotulo(TextBlock rotulo)
     {
-        _emailCopiado?.Stop();
-        EmailRotulo.Text = "E-mail";
-        EmailRotulo.Foreground = Pincel("TextoApagado");
+        if (!_copiados.Remove(rotulo, out var copiado))
+            return;
+        copiado.Relogio.Stop();
+        rotulo.Text = copiado.Original;
+        rotulo.Foreground = Pincel("TextoApagado");
+    }
+
+    private void VoltarRotulos()
+    {
+        foreach (var rotulo in _copiados.Keys.ToList())
+            VoltarRotulo(rotulo);
     }
 }

@@ -72,12 +72,13 @@ uma falha não para a fila. Os arquivos vão para uma subpasta com o nome da pla
 - O yt-dlp grava numa pasta interna e o app entrega o arquivo. Assim a proteção contra ransomware
   do Windows, que bloqueia programas novos em Músicas e Documentos, não atrapalha.
 - Atualiza sozinho pelo GitHub Releases, conferindo o SHA-256 antes de trocar o executável.
-- A lógica fica numa biblioteca separada da tela, com 215 testes, vários deles sobre respostas reais
+- A lógica fica numa biblioteca separada da tela, com 224 testes, vários deles sobre respostas reais
   do YouTube Music, do Spotify, do Deezer e do SoundCloud. As imagens deste README saem do próprio app:
   `RDTrackDownloader.exe --demo` desenha cada quadro, com músicas e capas fictícias.
 
 C# · WPF · .NET 10 · [yt-dlp](https://github.com/yt-dlp/yt-dlp) ·
-[FFmpeg](https://ffmpeg.org) · [Deno](https://deno.com) · [TagLib#](https://github.com/mono/taglib-sharp)
+[FFmpeg](https://ffmpeg.org) · [Deno](https://deno.com) · [TagLib#](https://github.com/mono/taglib-sharp) ·
+[QRCoder](https://github.com/Shane32/QRCoder)
 
 ## Rodar o código
 

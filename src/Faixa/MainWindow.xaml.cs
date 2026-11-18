@@ -292,11 +292,11 @@ public partial class MainWindow : Window
 
     private void OnPreviewKeyDown(object sender, KeyEventArgs e)
     {
-        if (SobreAberto)
+        if (PainelAberto)
         {
             if (e.Key == Key.Escape)
             {
-                FecharSobre();
+                FecharPaineis();
                 e.Handled = true;
             }
             return;
@@ -312,14 +312,14 @@ public partial class MainWindow : Window
 
     private void OnPreviewDragOver(object sender, DragEventArgs e)
     {
-        e.Effects = !_baixando && !SobreAberto && e.Data.GetDataPresent(DataFormats.UnicodeText) ? DragDropEffects.Copy : DragDropEffects.None;
+        e.Effects = !_baixando && !PainelAberto && e.Data.GetDataPresent(DataFormats.UnicodeText) ? DragDropEffects.Copy : DragDropEffects.None;
         e.Handled = true;
     }
 
     private void OnPreviewDrop(object sender, DragEventArgs e)
     {
         e.Handled = true;
-        if (!_baixando && !SobreAberto && e.Data.GetData(DataFormats.UnicodeText) is string texto && texto.Trim().Length > 0)
+        if (!_baixando && !PainelAberto && e.Data.GetData(DataFormats.UnicodeText) is string texto && texto.Trim().Length > 0)
             DefinirLink(texto.Trim());
     }
 
@@ -1479,6 +1479,7 @@ public partial class MainWindow : Window
         BotaoAtualizar.ToolTip = $"Há uma versão nova ({_versaoNova.Texto}). Você está na {Atualizador.VersaoAtualTexto}.";
         BotaoAtualizar.Visibility = Visibility.Visible;
         BotaoSobreTexto.Visibility = Visibility.Collapsed;
+        BotaoApoiar.Visibility = Visibility.Collapsed; // senão o nome do programa é cortado; o Pix segue no Sobre
     }
 
     private async void Atualizar_Click(object sender, RoutedEventArgs e)
@@ -2140,9 +2141,11 @@ public partial class MainWindow : Window
             BotaoAtualizarTexto.Text = "Versão 1.2";
             BotaoAtualizar.Visibility = Visibility.Visible;
             BotaoSobreTexto.Visibility = Visibility.Collapsed;
+            BotaoApoiar.Visibility = Visibility.Collapsed;
             await Salvar("18-versao-nova");
             BotaoAtualizar.Visibility = Visibility.Collapsed;
             BotaoSobreTexto.Visibility = Visibility.Visible;
+            BotaoApoiar.Visibility = Visibility.Visible;
             _avisoResultado = null;
 
             // Outras plataformas, pelo caminho normal da janela (dados reais dos serviços).
@@ -2227,7 +2230,13 @@ public partial class MainWindow : Window
             await Salvar("28-sobre");
             CopiarEmail_Click(this, new RoutedEventArgs());
             await Salvar("29-sobre-email-copiado");
-            FecharSobre();
+            AbrirApoio(); // pelo link do rodapé do Sobre
+            registro.Add($"apoio: sobre={SobreAberto} apoio={ApoioAberto} rotulo do e-mail={EmailRotulo.Text}");
+            await Salvar("30-apoio");
+            CopiarCodigoPix_Click(this, new RoutedEventArgs());
+            CopiarChavePix_Click(this, new RoutedEventArgs());
+            await Salvar("31-apoio-copiado");
+            FecharApoio();
 
             File.WriteAllLines(Path.Combine(pasta, "plataformas.txt"), registro);
         }

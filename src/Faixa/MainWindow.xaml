@@ -33,6 +33,7 @@
                     <ColumnDefinition />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Image Source="Assets/faixa.png" Width="38" Height="38"
                        RenderOptions.BitmapScalingMode="HighQuality" />
@@ -50,8 +51,14 @@
                         <TextBlock x:Name="BotaoAtualizarTexto" Text="Nova versão" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
+                <!-- Apoiar: abre o Pix. Só o coração, para caber ao lado do Sobre; some com a etiqueta de versão nova. -->
+                <Button x:Name="BotaoApoiar" Grid.Column="3" Style="{StaticResource BotaoFantasma}" Padding="9,7" Margin="4,0,0,0"
+                        VerticalAlignment="Center" Click="Apoiar_Click" ToolTip="Apoiar o projeto com um Pix">
+                    <TextBlock Text="&#xEB51;" FontFamily="{StaticResource Icones}" FontSize="15" Margin="0,1,0,0"
+                               Foreground="{StaticResource Destaque}" />
+                </Button>
                 <!-- Sobre: versão, quem fez e contato. Com a etiqueta de versão nova ao lado, fica só o ícone. -->
-                <Button x:Name="BotaoSobre" Grid.Column="3" Style="{StaticResource BotaoFantasma}" Margin="4,0,-10,0"
+                <Button x:Name="BotaoSobre" Grid.Column="4" Style="{StaticResource BotaoFantasma}" Margin="0,0,-10,0"
                         VerticalAlignment="Center" Click="Sobre_Click" ToolTip="Sobre o programa e contato">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="&#xE946;" FontFamily="{StaticResource Icones}" FontSize="14" VerticalAlignment="Center" Margin="0,1,0,0" />
@@ -410,10 +417,101 @@
                         <TextBlock Text="·" Margin="9,0" FontSize="12" Foreground="{StaticResource TextoApagado}" />
                         <Button Style="{StaticResource BotaoLink}" FontSize="12" Content="Relatar um problema"
                                 Tag="{x:Static local:Sobre.Problemas}" Click="Endereco_Click" ToolTip="Abrir um chamado no GitHub" />
+                        <TextBlock Text="·" Margin="9,0" FontSize="12" Foreground="{StaticResource TextoApagado}" />
+                        <Button Style="{StaticResource BotaoLink}" FontSize="12" Content="Apoiar com Pix"
+                                Click="Apoiar_Click" ToolTip="Ver o QR e a chave Pix" />
                     </StackPanel>
                     <TextBlock Margin="0,8,0,0" FontSize="11.5" Foreground="{StaticResource TextoApagado}" TextWrapping="Wrap"
                                LineHeight="16" LineStackingStrategy="BlockLineHeight"
-                               Text="Usa yt-dlp, FFmpeg, Deno e TagLib#, todos de código aberto. Use para baixar o que você tem direito de baixar." />
+                               Text="Usa yt-dlp, FFmpeg, Deno, TagLib# e QRCoder, todos de código aberto. Use para baixar o que você tem direito de baixar." />
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- Apoiar: Pix pelo QR, pelo copia e cola ou pela chave. Fecha como o Sobre. -->
+        <Grid x:Name="PainelApoio" Background="#E00B0C10" Visibility="Collapsed" Focusable="True" FocusVisualStyle="{x:Null}"
+              KeyboardNavigation.TabNavigation="Cycle" MouseLeftButtonDown="PainelApoio_MouseLeftButtonDown">
+            <Border Margin="22,0" VerticalAlignment="Center" Padding="22,20,22,18"
+                    Background="{StaticResource Superficie}" BorderBrush="{StaticResource BordaForte}" BorderThickness="1" CornerRadius="16">
+                <Border.RenderTransform>
+                    <TranslateTransform x:Name="CartaoApoioDesloc" />
+                </Border.RenderTransform>
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="40" ShadowDepth="12" Direction="270" Opacity="0.6" Color="Black" />
+                </Border.Effect>
+                <StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Border Width="52" Height="52" CornerRadius="14" Background="{StaticResource DestaqueGradiente}">
+                            <TextBlock Text="&#xEB52;" FontFamily="{StaticResource Icones}" FontSize="22" Foreground="White"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,2,0,0" />
+                        </Border>
+                        <StackPanel Grid.Column="1" Margin="14,0,0,0" VerticalAlignment="Center">
+                            <TextBlock Text="Apoie o projeto" FontFamily="{StaticResource FonteTitulo}" FontSize="19" FontWeight="SemiBold" />
+                            <TextBlock Text="Pix de qualquer valor" FontSize="12" Foreground="{StaticResource TextoSuave}" Margin="0,2,0,0" />
+                        </StackPanel>
+                        <Button Grid.Column="2" Style="{StaticResource BotaoFantasma}" Padding="9,7" Margin="0,-6,-10,0"
+                                VerticalAlignment="Top" Click="FecharApoio_Click" ToolTip="Fechar (Esc)">
+                            <TextBlock Text="&#xE711;" FontFamily="{StaticResource Icones}" FontSize="12" />
+                        </Button>
+                    </Grid>
+
+                    <TextBlock Margin="0,16,0,0" FontSize="13" Foreground="{StaticResource TextoSuave}" TextWrapping="Wrap"
+                               LineHeight="19" LineStackingStrategy="BlockLineHeight"
+                               Text="O RD Track Downloader é gratuito. Se ele foi útil para você, dá para contribuir com o valor que quiser." />
+
+                    <!-- Fundo branco com a margem que os leitores de QR precisam (4 módulos) -->
+                    <Border Width="196" Height="196" Margin="0,18,0,0" Padding="14" HorizontalAlignment="Center"
+                            Background="White" CornerRadius="14">
+                        <Image x:Name="QrPix" Stretch="Uniform" RenderOptions.EdgeMode="Aliased" />
+                    </Border>
+                    <TextBlock Text="Aponte a câmera do app do banco" FontSize="11.5" Foreground="{StaticResource TextoApagado}"
+                               HorizontalAlignment="Center" Margin="0,10,0,0" />
+
+                    <StackPanel Margin="-8,12,-8,0">
+                    <Button Style="{StaticResource LinhaContato}" Click="CopiarCodigoPix_Click" ToolTip="Copiar o código para colar no app do banco">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Border Width="34" Height="34" CornerRadius="9" Background="{StaticResource Superficie2}">
+                                <TextBlock Text="&#xED14;" FontFamily="{StaticResource Icones}" FontSize="15"
+                                           Foreground="{StaticResource TextoSuave}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <StackPanel Grid.Column="1" Margin="11,0,8,0" VerticalAlignment="Center">
+                                <TextBlock x:Name="PixCodigoRotulo" Text="Pix copia e cola" FontSize="11" Foreground="{StaticResource TextoApagado}" />
+                                <TextBlock Text="Copiar o código" FontSize="13" FontWeight="SemiBold" Margin="0,1,0,0" />
+                            </StackPanel>
+                            <TextBlock Grid.Column="2" Text="&#xE8C8;" FontFamily="{StaticResource Icones}" FontSize="12"
+                                       Foreground="{StaticResource TextoApagado}" VerticalAlignment="Center" Margin="0,0,4,0" />
+                        </Grid>
+                    </Button>
+                    <Button Style="{StaticResource LinhaContato}" Click="CopiarChavePix_Click" ToolTip="Copiar a chave">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Border Width="34" Height="34" CornerRadius="9" Background="{StaticResource Superficie2}">
+                                <TextBlock Text="&#xE8D7;" FontFamily="{StaticResource Icones}" FontSize="15"
+                                           Foreground="{StaticResource TextoSuave}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <StackPanel Grid.Column="1" Margin="11,0,8,0" VerticalAlignment="Center">
+                                <TextBlock x:Name="PixChaveRotulo" Text="Chave aleatória" FontSize="11" Foreground="{StaticResource TextoApagado}" />
+                                <TextBlock Text="{x:Static s:Apoio.Chave}" FontSize="12.5" FontWeight="SemiBold" Margin="0,1,0,0" TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                            <TextBlock Grid.Column="2" Text="&#xE8C8;" FontFamily="{StaticResource Icones}" FontSize="12"
+                                       Foreground="{StaticResource TextoApagado}" VerticalAlignment="Center" Margin="0,0,4,0" />
+                        </Grid>
+                    </Button>
+                    </StackPanel>
                 </StackPanel>
             </Border>
         </Grid>

@@ -12,6 +12,8 @@
   <ItemGroup>
     <!-- Grava artista, título, álbum e número da faixa no MP3/M4A/Opus (LGPL). -->
     <PackageReference Include="TagLibSharp" Version="2.3.0" />
+    <!-- Desenha o QR do Pix no painel de doação (MIT). -->
+    <PackageReference Include="QRCoder" Version="1.8.1" />
   </ItemGroup>
 
   <ItemGroup>

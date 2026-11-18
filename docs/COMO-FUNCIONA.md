@@ -61,7 +61,7 @@ Até a versão 1.1 a pasta interna era `%LOCALAPPDATA%\Faixa`. Na primeira abert
 ```
 src/Faixa/          app WPF (tela)
 src/Faixa.Nucleo/   lógica: links, yt-dlp, formatos, nomes, tags, playlists, atualização,
-                    Spotify, Deezer, SoundCloud e busca no YouTube Music
+                    Spotify, Deezer, SoundCloud, busca no YouTube Music e o Pix do botão Apoiar
 tests/Faixa.Testes/ testes xUnit do núcleo (Exemplos/: respostas reais reduzidas dos serviços)
 distribuicao/       LEIA-ME que vai no zip para os amigos
 publicar.sh         gera e publica uma versão no GitHub Releases
